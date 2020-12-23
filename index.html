@@ -68,6 +68,80 @@
         <footer class="container">
             <p>:copyright: 2020</p>
         </footer>
+        <script>
+            let login = document.querySelector('#login')
+            let notes = document.querySelector('#notes')
+            let user = document.querySelector('#inputEmail')
+            let btnLogIn = document.querySelector('#login-button')
+            let btnLogOut = document.querySelector('#logout')
+            let navbar = document.querySelector('.navbar-nav')
+            let noteText = document.querySelector('#note-text')
+            let noteContainer = document.querySelector('#notes-container')
+            let btnAddNote = document.querySelector('#add-note')
+            let currentUser = "current User"
+
+            function createNoteElem(message) {
+                let note = document.createElement('DIV');
+                note.classList.add('alert');
+                note.innerHTML = message;
+                noteContainer.appendChild(note);
+            }
+
+            function hiddenContainer() {
+                login.hidden = true;
+                notes.hidden = true;
+                navbar.hidden = true
+            }
+
+            btnLogIn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (user.value !== "") {
+                    location.hash = `#notes`
+                    localStorage.setItem(currentUser, user.value)
+                    if (!localStorage.getItem(user.value)) {
+                        const mass = [];
+                        localStorage.setItem(user.value, JSON.stringify(mass));
+                    }
+                }
+            })
+
+            btnLogOut.addEventListener('click', (e) => {
+                e.preventDefault();
+                location.hash = '#login'
+                for (let i of document.querySelectorAll('.alert')) {
+                    i.remove()
+                }
+            })
+
+            btnAddNote.addEventListener('click', (e) => {
+                e.preventDefault();
+                let arr = JSON.parse(localStorage.getItem(user.value));
+                arr.push(noteText.value);
+                localStorage.setItem(user.value, JSON.stringify(arr));
+                createNoteElem(noteText.value);
+            });
+
+            function changeLocation() {
+                hiddenContainer();
+                switch (location.hash) {
+                    case '#login':
+                        login.hidden = false;
+                        navbar.hidden = true
+                        break;
+                    case '#notes':
+                        notes.hidden = false;
+                        navbar.hidden = false
+                        let lastUser = localStorage.getItem(currentUser);
+                        (JSON.parse(localStorage.getItem(lastUser))).forEach(createNoteElem);
+                        break;
+                    default:
+                        login.hidden = false;
+                }
+            }
+
+            window.addEventListener('hashchange', changeLocation);
+            changeLocation();
+        </script>
     </body>
 
 </html>
